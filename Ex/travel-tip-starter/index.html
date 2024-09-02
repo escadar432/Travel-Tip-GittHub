@@ -26,7 +26,10 @@
         </form>
     </header>
     <main>
-        <div class="map"></div>
+        <div class="map">
+            <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV9fjU-Mk0sA3qkQ9z_9o9k2tKoVj6WE4&callback=initMap"></script>
+        </div>
         <div>
             <section class="locs-container">
                 <section class="loc-filter">
@@ -37,7 +40,8 @@
                     <div>
                         <label>
                             Min Rate:
-                            <input name="filter-by-rate" type="range" min="0" max="5" value="0" class="filter-rate-range"
+                            <input name="filter-by-rate" type="range" min="0" max="5" value="0"
+                                class="filter-rate-range"
                                 onchange="this.title=this.value;app.onSetFilterBy({minRate: this.value})" />
                         </label>
                     </div>
