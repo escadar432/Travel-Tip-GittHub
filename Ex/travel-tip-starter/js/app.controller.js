@@ -2,6 +2,8 @@ import { utilService } from './services/util.service.js'
 import { locService } from './services/loc.service.js'
 import { mapService } from './services/map.service.js'
 
+var gUserPos = null
+
 window.onload = onInit
 
 // To make things easier in this project structure 
@@ -37,24 +39,30 @@ function renderLocs(locs) {
 
     var strHTML = locs.map(loc => {
         const className = (loc.id === selectedLocId) ? 'active' : ''
+        var distanceStr = ''
+        if (gUserPos) {
+            const distance = utilService.getDistance(gUserPos, loc.geo)
+            distanceStr = ` (${distance} km away)`
+        }
         return `
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
+                ${distanceStr}
             </h4>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
                 ${(loc.createdAt !== loc.updatedAt) ?
-                ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}`
-                : ''}
+                ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}` : ''}
             </p>
             <div class="loc-btns">     
                <button title="Delete" onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
                <button title="Edit" onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
                <button title="Select" onclick="app.onSelectLoc('${loc.id}')">🗺️</button>
             </div>     
-        </li>`}).join('')
+        </li>`
+    }).join('')
 
     const elLocList = document.querySelector('.loc-list')
     elLocList.innerHTML = strHTML || 'No locs to show'
@@ -147,13 +155,14 @@ function loadAndRenderLocs() {
 function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
+            gUserPos = latLng
             mapService.panTo({ ...latLng, zoom: 15 })
             unDisplayLoc()
             loadAndRenderLocs()
             flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
         })
         .catch(err => {
-            console.error('OOPs:', err)
+            console.error('OOPs:', err.message || err)
             flashMsg('Cannot get your position')
         })
 }
@@ -196,8 +205,14 @@ function displayLoc(loc) {
 
     const el = document.querySelector('.selected-loc')
     el.querySelector('.loc-name').innerText = loc.name
-    el.querySelector('.loc-address').innerText = loc.geo.address
+    el.querySelector('.loc-address').innerText = loc.geo.address || 'No address available'
     el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
+
+    if (gUserPos) {
+        const distance = utilService.getDistance(gUserPos, loc.geo)
+        el.querySelector('.loc-rate').innerHTML += ` (${distance} km away)`
+    }
+
     el.querySelector('[name=loc-copier]').value = window.location
     el.classList.add('show')
 
