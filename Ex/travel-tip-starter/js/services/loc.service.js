@@ -34,14 +34,20 @@ export const locService = {
 }
 
 function query() {
+    const filterBy = getFilterBy()
     return storageService.query(DB_KEY)
         .then(locs => {
-            if (gFilterBy.txt) {
-                const regex = new RegExp(gFilterBy.txt, 'i')
-                locs = locs.filter(loc => regex.test(loc.name))
+            if (filterBy.txt) {
+                const txt = filterBy.txt.toLowerCase()
+                // const regex = new RegExp(gFilterBy.txt, 'i')
+                // locs = locs.filter(loc => regex.test(loc.name))
+                locs = locs.filter(loc =>
+                    loc.name.toLowerCase().includes(txt) ||
+                    (loc.geo.address && loc.geo.address.toLowerCase().includes(txt))
+                )
             }
-            if (gFilterBy.minRate) {
-                locs = locs.filter(loc => loc.rate >= gFilterBy.minRate)
+            if (filterBy.minRate) {
+                locs = locs.filter(loc => loc.rate >= filterBy.minRate)
             }
 
             // No paging (unused)
@@ -82,7 +88,11 @@ function save(loc) {
 
 function setFilterBy(filterBy = {}) {
     if (filterBy.txt !== undefined) gFilterBy.txt = filterBy.txt
-    if (filterBy.minRate !== undefined && !isNaN(filterBy.minRate)) gFilterBy.minRate = filterBy.minRate
+    if (filterBy.minRate !== undefined) gFilterBy.minRate = filterBy.minRate
+    return gFilterBy
+}
+
+function getFilterBy() {
     return gFilterBy
 }
 
