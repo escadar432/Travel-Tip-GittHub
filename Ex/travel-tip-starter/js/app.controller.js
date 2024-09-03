@@ -69,18 +69,38 @@ function renderLocs(locs) {
 }
 
 function onRemoveLoc(locId) {
-    locService.remove(locId)
-        .then(() => {
-            flashMsg('Location removed')
-            unDisplayLoc()
-            loadAndRenderLocs()
-        })
-        .catch(err => {
-            console.error('OOPs:', err)
-            flashMsg('Cannot remove location')
+    var res = onRemoveSwalAlert("Are you sure you want to delete item?")
+    res.then((result) => {
+        if (result.isConfirmed) { //user said yes, delete loc from serivce 
+            locService.remove(locId)
+                .then(() => {
+                    flashMsg('Location removed')
+                    unDisplayLoc()
+                    loadAndRenderLocs()
+                })
+                .catch(err => {
+                    console.error('OOPs:', err)
+                    flashMsg('Cannot remove location,Try again later')
+                })
+            return
+        } else if (result.isDenied) {
+            return "no"
+        } else if (result.dismiss) {
+            return 'no answer'
+        }
+    })
+        .catch((err) => {
+            console.error("Error:", err);
         })
 }
 
+function onRemoveSwalAlert(title) {
+    var res = Swal.fire({
+        title,
+        showDenyButton: true,
+    })
+    return res
+}
 function onSearchAddress(ev) {
     ev.preventDefault()
     const el = document.querySelector('[name=address]')
@@ -223,7 +243,7 @@ function getFilterByFromQueryParams() {
     const queryParams = new URLSearchParams(window.location.search)
     const txt = queryParams.get('txt') || ''
     const minRate = queryParams.get('minRate') || 0
-    locService.setFilterBy({txt, minRate})
+    locService.setFilterBy({ txt, minRate })
 
     document.querySelector('input[name="filter-by-txt"]').value = txt
     document.querySelector('input[name="filter-by-rate"]').value = minRate

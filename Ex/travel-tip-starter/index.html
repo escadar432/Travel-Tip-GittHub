@@ -26,7 +26,11 @@
         </form>
     </header>
     <main>
-        <div class="map"></div>
+        <div class="map"> <script
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNHUObdNCF7VFIMkhY59IrcwBqMwetx64&loading=async&libraries=maps,marker&v=beta"
+                defer>
+            </script>
+            </div>
         <div>
             <section class="locs-container">
                 <section class="loc-filter">
@@ -68,7 +72,8 @@
     </main>
     <pre class="debug" hidden></pre>
     <div class="user-msg"></div>
-    <script type="module" src="js/app.controller.js"></script>
+    <script src="libs/swal.js"></script>
+        <script type="module" src="js/app.controller.js"></script>
 </body>
 
 </html>
