@@ -74,8 +74,24 @@
     </main>
     <pre class="debug" hidden></pre>
     <div class="user-msg"></div>
+    <dialog id="loc-dialog">
+        <form method="dialog" id="loc-form">
+            <h2 id="dialog-title">Add Location</h2>
+
+            <label for="loc-name">Name:</label>
+            <input type="text" id="loc-name" name="name" required />
+
+            <label for="loc-rate">Rate:</label>
+            <input type="number" id="loc-rate" name="rate" min="1" max="5" required />
+
+            <div class="dialog-buttons">
+                <button id="submit-loc-btn" type="submit">Save</button>
+                <button type="button" onclick="document.getElementById('loc-dialog').close()">Cancel</button>
+            </div>
+        </form>
+    </dialog>
     <script src="libs/swal.js"></script>
-        <script type="module" src="js/app.controller.js"></script>
+    <script type="module" src="js/app.controller.js"></script>
 </body>
 
 </html>

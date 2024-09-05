@@ -123,24 +123,45 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
+    // const locName = prompt('Loc name', geo.address || 'Just a place')
+    // if (!locName) return
+    const dialog = document.getElementById('loc-dialog')
+    const form = document.getElementById('loc-form')
 
-    const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
+    dialog.dataset.geo = JSON.stringify(geo)
+    document.getElementById('dialog-title').innerText = 'Add Location'
+
+    form.reset() // Clear the form inputs
+    dialog.showModal()// Open the dialog
+
+    form.onsubmit = () => {
+        const locName = document.getElementById('loc-name').value
+        const locRate = parseInt(document.getElementById('loc-rate').value, 10)
+
+        const loc = {
+            name: locName,
+            rate: locRate,
+            // rate: +prompt(`Rate (1-5)`, '3'),
+            // geo
+            geo: JSON.parse(dialog.dataset.geo), // Retrieve geo data from dialog dataset
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        }
+        locService.save(loc)
+            .then((savedLoc) => {
+                // flashMsg(`Added Location (id: ${savedLoc.id})`)
+                // utilService.updateQueryParams({ locId: savedLoc.id })
+                flashMsg(`Added Location (id: ${savedLoc.id})`)
+                loadAndRenderLocs()
+            })
+            .catch(err => {
+                // console.error('OOPs:', err)
+                // flashMsg('Cannot add location')
+                flashMsg('Error adding location')
+                console.error(err)
+            })
+        dialog.close()
     }
-    locService.save(loc)
-        .then((savedLoc) => {
-            flashMsg(`Added Location (id: ${savedLoc.id})`)
-            utilService.updateQueryParams({ locId: savedLoc.id })
-            loadAndRenderLocs()
-        })
-        .catch(err => {
-            console.error('OOPs:', err)
-            flashMsg('Cannot add location')
-        })
 }
 
 function loadAndRenderLocs() {
@@ -168,22 +189,60 @@ function onPanToUserPos() {
 }
 
 function onUpdateLoc(locId) {
+    // locService.getById(locId)
+    //     .then(loc => {
+    //         const rate = prompt('New rate?', loc.rate)
+    //         if (rate && rate !== loc.rate) {
+    //             loc.rate = rate
+    //             locService.save(loc)
+    //                 .then(savedLoc => {
+    //                     flashMsg(`Rate was set to: ${savedLoc.rate}`)
+    //                     loadAndRenderLocs()
+    //                 })
+    //                 .catch(err => {
+    //                     console.error('OOPs:', err)
+    //                     flashMsg('Cannot update location')
+    //                 })
+
+    //         }
+    //     })
+    const dialog = document.getElementById('loc-dialog')
+    const form = document.getElementById('loc-form')
+
     locService.getById(locId)
         .then(loc => {
-            const rate = prompt('New rate?', loc.rate)
-            if (rate && rate !== loc.rate) {
-                loc.rate = rate
+            document.getElementById('dialog-title').innerText = 'Update Location'
+
+            // Pre-fill the form with the current location data
+            document.getElementById('loc-name').value = loc.name
+            document.getElementById('loc-rate').value = loc.rate
+
+            dialog.showModal() // Open the dialog
+
+            form.onsubmit = () => {
+                const locName = document.getElementById('loc-name').value
+                const locRate = parseInt(document.getElementById('loc-rate').value, 10)
+
+                loc.name = locName
+                loc.rate = locRate
+                loc.updatedAt = Date.now()
+
                 locService.save(loc)
                     .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
+                        flashMsg(`Updated Location (id: ${savedLoc.id})`)
                         loadAndRenderLocs()
                     })
                     .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
+                        flashMsg('Error updating location')
+                        console.error(err)
+                    });
 
+                dialog.close() // Close the dialog after submit
             }
+        })
+        .catch(err => {
+            flashMsg('Error fetching location details')
+            console.error(err)
         })
 }
 

@@ -82,8 +82,10 @@ function save(loc) {
         loc.updatedAt = Date.now()
         return storageService.put(DB_KEY, loc)
     } else {
-        loc.createdAt = loc.updatedAt = Date.now()
-        return storageService.post(DB_KEY, loc)
+        loc.id = utilService.makeId() // Assign a new ID for a new location
+        loc.createdAt = Date.now()
+        loc.updatedAt = loc.createdAt
+        return storageService.post(DB_KEY, loc) // Add new location
     }
 }
 
