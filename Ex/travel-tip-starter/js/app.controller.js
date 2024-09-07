@@ -357,6 +357,10 @@ function renderLocStats() {
     locService.getLocCountByRateMap().then(stats => {
         handleStats(stats, 'loc-stats-rate')
     })
+
+    locService.getLocCountByUpdatedMap().then(stats => {
+        handleStats(stats, 'loc-stats-updated')
+    })
 }
 
 function handleStats(stats, selector) {
@@ -364,6 +368,10 @@ function handleStats(stats, selector) {
     // stats = { low: 5, medium: 5, high: 5, baba: 55, mama: 30, total: 100 }
     const labels = cleanStats(stats)
     const colors = utilService.getColors()
+
+    console.log("stats are:",stats)
+    
+    console.log("selector are:",selector)
 
     var sumPercent = 0
     var colorsStr = `${colors[0]} ${0}%, `
