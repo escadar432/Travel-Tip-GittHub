@@ -56,6 +56,7 @@
 .loc-filter {
     background-color: var(--bg1);
     padding: 0.3em;
+    margin: -8px;
 }
 
 .loc-filter input[type=text] {
@@ -113,7 +114,7 @@ dialog#loc-dialog {
 
 input[type="text"],
 input[type="number"] {
-    padding: 10px;
+    padding-inline-start: 5px;
     border-radius: 5px;
     border: 2px solid #ddd;
     font-size: 1em;
